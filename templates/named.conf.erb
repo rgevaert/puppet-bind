@@ -71,7 +71,9 @@ options {
 <% if !@allow_query_cache.empty? -%>
     allow-query-cache { <%= @allow_query_cache.join("; ") %>; };
 <% end -%>
+<% if !@recursion.empty? -%>
     recursion <%= @recursion %>;
+<% end -%>
 <% if !@allow_recursion.empty? -%>
     allow-recursion { <%= @allow_recursion.join("; ") %>; };
 <% end -%>
@@ -155,12 +157,14 @@ view "<%= key %>" {
 <% else -%><%# end views, start no views -%>
 
 <% if @recursion == 'yes' -%>
+<% if @osfamily != 'Debian' -%>
 zone "." IN {
     type hint;
     file "named.ca";
 };
-
 <% end -%>
+<% end -%>
+
 <% if !@zones.empty? -%>
 <% @zones.sort_by {|key, value| key}.each do |key,value| -%>
 zone "<%= key %>" IN {
@@ -172,7 +176,9 @@ zone "<%= key %>" IN {
 <% end -%>
 <% end -%>
 <% if @recursion == 'yes' -%>
+<% if @osfamily != 'Debian' -%>
 include "/etc/named.rfc1912.zones";
+<% end -%>
 <% end -%>
 <% end -%><%# end no views -%>
 <% if !@includes.empty? -%>
